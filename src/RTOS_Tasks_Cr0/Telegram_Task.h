@@ -1,11 +1,13 @@
 /**
  * @file Telegram_Task.h
  * @brief FreeRTOS task interface for Telegram bot interactions.
+ * 
  * @details
  * This header defines the interface for the Telegram task, which manages
  * communications with a Telegram bot. The task periodically checks for new
  * messages and responds with sensor data. It also includes a function to handle
  * incoming messages and execute corresponding actions.
+ * 
  * @author  Sergei Lazarev
  * @date    2026-02-17
  * @version 1.0

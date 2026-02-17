@@ -1,14 +1,17 @@
 /**
  * @file Wifi_Task.h
- * @brief Header for Wi-Fi management task in FreeRTOS.
- *
- * This file defines the interface for the Wi-Fi task, which is responsible for
- * managing the Wi-Fi connection, monitoring its status, and communicating events
- * to the system event queue. It includes necessary headers and defines constants
- * for task timing.
- *
- * @author Serghei
- * @date 2024-06-01
+ * @brief FreeRTOS task interface for Wi-Fi management.
+ * 
+ * @details
+ * This header defines the interface for the Wi-Fi task, which manages
+ * the Wi-Fi connection. The task periodically checks the connection status
+ * and attempts to reconnect if necessary. It also includes a function to
+ * handle Wi-Fi events and update shared data.
+ * 
+ * @author  Sergei Lazarev
+ * @date    2026-02-17
+ * @version 1.0
+ * @note    Designed for ESP32 platform running FreeRTOS.
  */
 
 #pragma once
