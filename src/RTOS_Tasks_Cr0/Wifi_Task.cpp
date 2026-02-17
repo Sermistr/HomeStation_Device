@@ -1,3 +1,13 @@
+/**
+ * @file Wifi_Task.cpp
+ * @brief Implementation of Wi-Fi management task in FreeRTOS.
+ * This file contains the implementation of the Wi-Fi task, which is responsible for
+ * managing the Wi-Fi connection, monitoring its status, and communicating events to the system event queue.  
+ * The task periodically checks the Wi-Fi connection status and attempts to reconnect if disconnected.
+ *
+ * @author Serghei
+ * @date 2024-06-01
+ */
 #include "Wifi_Task.h"
 
 uint8_t counter = 0;
@@ -51,7 +61,7 @@ void WiFiTask(void *pv)
             WiFi.reconnect();
         }
 
-        vTaskDelay(pdMS_TO_TICKS(WIFI_TASK_REC));
+        vTaskDelay((WIFI_TASK_PERIOD_MS / portTICK_PERIOD_MS));
     }
 }
 

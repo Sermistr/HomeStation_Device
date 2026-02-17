@@ -1,3 +1,19 @@
+/**
+ * @file Telegram_Task.cpp
+ * @brief FreeRTOS task for handling Telegram bot interactions.
+ *
+ * @details
+ * This module provides the interface for managing Telegram bot communications.
+ * The task periodically checks for new messages and responds with sensor data.
+ *
+ * @author  Sergei Lazarev
+ * @date    2026-02-17
+ * @version 1.0
+ *
+ * @note    Designed for ESP32 platform running FreeRTOS.
+ */
+
+
 #include "Telegram_Task.h"
 
 WiFiClientSecure client;
@@ -36,7 +52,7 @@ void TelegramTask(void *pvParameters)
             HandleNewMessages(bot.getUpdates(bot.last_message_received + 1));
         }
         
-        vTaskDelay(TELEGRAM_TASK_REC / portTICK_PERIOD_MS);
+        vTaskDelay(TELEGRAM_TASK_PERIOD_MS / portTICK_PERIOD_MS);
     }
 }
 
