@@ -1,3 +1,20 @@
+/**
+ * @file    LCD_Display_Task.cpp
+ * @brief   Manages the LCD display, showing temperature and humidity readings.
+ *
+ * @details
+ * This task receives sensor data and updates the LCD display accordingly.
+ * It also monitors the health of the LCD and reports any errors via a FreeRTOS queue.
+ *
+ * @author  Sergei Lazarev
+ * @date    2026-02-17
+ * @version 1.0
+ *
+ * @note    Designed for FreeRTOS-based embedded system.
+ */
+
+
+
 #include "LCD_Display_Task.h"
 
 
@@ -54,7 +71,7 @@ void LCDDisplayTask(void* pvParameters)
         
         lcdPrint(temperature, humidity);
 
-        vTaskDelay(LCD_DISPLAY_TASK_REC / portTICK_PERIOD_MS); // Delay for 2 seconds
+        vTaskDelay(LCD_DISPLAY_TASK_PERIOD_MS / portTICK_PERIOD_MS); // Delay for 2 seconds
     }
 }
 

@@ -1,3 +1,21 @@
+/**
+ * @file    DHT_Sensor_Task.cpp
+ * @brief   Monitors the DHT sensor and updates temperature and humidity readings.
+ *
+ * @details
+ * This task reads data from the DHT sensor and updates the shared sensorData structure.
+ * It also reports any errors via a FreeRTOS queue.
+ *
+ *
+ * @author  Sergei Lazarev
+ * @date    2026-02-17
+ * @version 1.0
+ *
+ * @note    Designed for FreeRTOS-based embedded system.
+ */
+
+
+
 #include "DHT_Sensor_Task.h"
 
 
@@ -46,6 +64,6 @@ void DHTSensorTask(void* pvParameters)
         }
 
         // Delay before the next reading
-        vTaskDelay(DHT_SENSOR_TASK_REC / portTICK_PERIOD_MS); // Delay for 2 seconds
+        vTaskDelay(DHT_SENSOR_TASK_PERIOD_MS / portTICK_PERIOD_MS); // Delay for 2 seconds
     }
 }

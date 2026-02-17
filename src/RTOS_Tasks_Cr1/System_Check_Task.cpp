@@ -1,3 +1,21 @@
+/**
+ * @file    System_Check_Task.cpp
+ * @brief   Monitors overall system state and handles error indication.
+ *
+ * @details
+ * This task receives system events from WiFi, DHT sensor, and LCD tasks
+ * via a FreeRTOS queue. It updates the shared SystemStatus_t structure
+ * and controls a status LED. If any subsystem enters an error state,
+ * the LED is activated and diagnostic information is printed to Serial.
+ *
+ * @author  Sergei Lazarev
+ * @date    2026-02-17
+ * @version 1.0
+ *
+ * @note    Designed for FreeRTOS-based embedded system.
+ */
+
+
 #include "System_Check_Task.h"
 
 
