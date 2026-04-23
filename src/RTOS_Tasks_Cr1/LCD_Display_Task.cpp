@@ -18,7 +18,7 @@
 #include "LCD_Display_Task.h"
 
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 
 void LCDDisplayTask(void* pvParameters)
@@ -30,8 +30,9 @@ void LCDDisplayTask(void* pvParameters)
 
     float temperature = 0.0;
     float humidity = 0.0;
+    uint16_t light = 0;
 
-    bool lcdWasCrushed = false; 
+    bool lcdWasCrushed = false;
 
     SystemEvent_t event;
 
@@ -42,6 +43,7 @@ void LCDDisplayTask(void* pvParameters)
             if (xSemaphoreTake(dataMutex, MUTEX_TIMEOUT) == pdTRUE) {
                 temperature = sensorData.temperature;
                 humidity = sensorData.humidity;
+                light = sensorData.lightLevel;
                 xSemaphoreGive(dataMutex);
             }
             
@@ -69,7 +71,7 @@ void LCDDisplayTask(void* pvParameters)
             lcdWasCrushed = true;
         }
         
-        lcdPrint(temperature, humidity);
+        lcdPrint(temperature, humidity, light);
 
         vTaskDelay(LCD_DISPLAY_TASK_PERIOD_MS / portTICK_PERIOD_MS); // Delay for 2 seconds
     }
@@ -82,24 +84,33 @@ bool lcdCheck() {
 }
 
 
-void lcdPrint(float t, float h)
+void lcdPrint(float t, float h, uint16_t light)
 {
     static float lastTemp = 0.0;
     static float lastHum = 0.0;
+    static int   lastLightPct = -1;
 
-    
+
     if (lastTemp != t)
     {
         lcd.setCursor(0, 0);
-        lcd.printf("Temp: %.1f C", t);
+        lcd.printf("Temp: %.1f C    ", t);
         lastTemp = t;
     }
-    
+
     if (lastHum != h)
     {
         lcd.setCursor(0, 1);
-        lcd.printf("Hum: %.1f %%", h);
+        lcd.printf("Hum:  %.1f %%   ", h);
         lastHum = h;
+    }
+
+    int lightPct = (int)((light * 100UL) / 4095UL);
+    if (lastLightPct != lightPct)
+    {
+        lcd.setCursor(0, 2);
+        lcd.printf("Light: %3d %%    ", lightPct);
+        lastLightPct = lightPct;
     }
 }
 

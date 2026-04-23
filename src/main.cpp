@@ -8,9 +8,11 @@
 #include "RTOS_Tasks_Cr1/DHT_Sensor_Task.h"
 #include "RTOS_Tasks_Cr1/LCD_Display_Task.h"
 #include "RTOS_Tasks_Cr1/System_Check_Task.h"
+#include "RTOS_Tasks_Cr1/Photo_Sensor_Task.h"
 
 #include "RTOS_Tasks_Cr0/Wifi_Task.h"
 #include "RTOS_Tasks_Cr0/Telegram_Task.h"
+#include "RTOS_Tasks_Cr0/GPT_Task.h"
 
 
 // initialize FreeRTOS objects
@@ -21,11 +23,16 @@ QueueHandle_t systemEventQueue;
 SharedData_t sensorData = {
     .temperature = 0.0,
     .humidity = 0.0,
-    .wifiConnected = false
+    .lightLevel = 0,
+    .wifiConnected = false,
+    .gptAdvice = {0}
 };
 
 void setup() {
   Serial.begin(115200);
+  strlcpy(sensorData.gptAdvice,
+          "No advice yet. Waiting for first climate reading...",
+          GPT_ADVICE_MAX_LEN);
   // Create a Mutex for shared data access
   dataMutex = xSemaphoreCreateMutex();
   if (dataMutex == NULL)
@@ -43,11 +50,13 @@ void setup() {
   }
 
   // Create DHT Sensor Task
-  xTaskCreatePinnedToCore(DHTSensorTask, "DHT Sensor Task", 4096, NULL, 3, NULL, 1);
-  xTaskCreatePinnedToCore(LCDDisplayTask, "LCD Display Task", 4096, NULL, 1, NULL, 1);
-  xTaskCreatePinnedToCore(SystemCheckTask, "System Status Task", 4096, NULL, 2, NULL, 1);
-  xTaskCreatePinnedToCore(WiFiTask, "WiFi Task", 4096, NULL, 3, NULL, 0);
-  xTaskCreatePinnedToCore(TelegramTask, "Telegram Task", 8192, NULL, 2, NULL, 0);
+  xTaskCreatePinnedToCore(DHTSensorTask,   "DHT Sensor Task",     4096, NULL, 3, NULL, 1);
+  xTaskCreatePinnedToCore(PhotoSensorTask, "Photo Sensor Task",   2048, NULL, 3, NULL, 1);
+  xTaskCreatePinnedToCore(LCDDisplayTask,  "LCD Display Task",    4096, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(SystemCheckTask, "System Status Task",  4096, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(WiFiTask,        "WiFi Task",           4096, NULL, 3, NULL, 0);
+  xTaskCreatePinnedToCore(TelegramTask,    "Telegram Task",       8192, NULL, 2, NULL, 0);
+  xTaskCreatePinnedToCore(GPTTask,         "GPT Task",           12288, NULL, 1, NULL, 0);
 }
 
 

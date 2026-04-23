@@ -22,7 +22,7 @@ uint8_t counter = 0;
 // WiFi Management Task
 void WiFiTask(void *pv)
 {
-    WiFi.begin(WiFiConfig::HOME_SSID, WiFiConfig::HOME_PASSWORD);
+    WiFi.begin(WiFiConfig::OFFICE_SSID, WiFiConfig::OFFICE_PASSWORD);
 
     bool prevState = false;
 

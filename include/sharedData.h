@@ -7,15 +7,19 @@
 #include <freertos/queue.h>
 
 
-#define MUTEX_TIMEOUT pdMS_TO_TICKS(1000)       // 1 second timeout for mutex operations
+#define MUTEX_TIMEOUT pdMS_TO_TICKS(1000)  // 1 second timeout for mutex operations
 #define QUEUE_TIMEOUT pdMS_TO_TICKS(1000)  // 1 second timeout for queue read
 
+#define GPT_ADVICE_MAX_LEN 512
 
-typedef struct 
+
+typedef struct
 {
     float temperature;
     float humidity;
+    uint16_t lightLevel;   // raw ADC reading, 0..4095
     bool wifiConnected;
+    char gptAdvice[GPT_ADVICE_MAX_LEN];
 }SharedData_t;
 
 
@@ -28,6 +32,8 @@ enum System_Name
     DHT_SENSOR,
     WIFI,
     LCD_DISPLAY,
+    GPT_CHAT,
+    PHOTO_SENSOR,
 };
 
 enum System_Status
@@ -53,6 +59,8 @@ typedef struct
     System_Status DHTStatus;
     System_Status WifiStatus;
     System_Status LcdStatus;
+    System_Status GptStatus;
+    System_Status PhotoStatus;
 }SystemStatus_t;
 
 extern SystemStatus_t systemStatus;

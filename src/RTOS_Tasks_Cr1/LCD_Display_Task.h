@@ -48,12 +48,13 @@ void LCDDisplayTask(void* pvParameters);
 bool lcdCheck(void);
 
 /**
- * @brief Prints temperature and humidity values on LCD.
+ * @brief Prints temperature, humidity and ambient-light values on LCD.
  *
- * @param t Temperature value.
- * @param h Humidity value.
+ * @param t     Temperature value (°C).
+ * @param h     Humidity value (%).
+ * @param light Raw ADC light reading (0..4095).
  */
-void lcdPrint(float t, float h);
+void lcdPrint(float t, float h, uint16_t light);
 
 /**
  * @brief Reinitializes or refreshes the LCD display.

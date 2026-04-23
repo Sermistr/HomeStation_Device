@@ -13,4 +13,8 @@ namespace WiFiConfigTemplate
     // Telegram bot configuration
     constexpr char BOT_TOKEN[] = "YourBotToken";  // Replace with your Telegram bot token
     constexpr char ADMIN_CHAT_ID[] = "YourAdminChatID"; // Replace with the Telegram chat ID of the admin user
+
+    // Groq (LLM) configuration - OpenAI-compatible API
+    constexpr char GROQ_API_KEY[] = "YourGroqAPIKey";       // Get a key at https://console.groq.com/keys
+    constexpr char GROQ_MODEL[]   = "llama-3.1-8b-instant"; // Groq model (llama-3.1-8b-instant, llama-3.3-70b-versatile, ...)
 }

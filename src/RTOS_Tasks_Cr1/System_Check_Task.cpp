@@ -24,7 +24,9 @@ SystemStatus_t systemStatus
 {
     .DHTStatus = SYSTEM_OK,
     .WifiStatus = SYSTEM_OK,
-    .LcdStatus = SYSTEM_OK
+    .LcdStatus = SYSTEM_OK,
+    .GptStatus = SYSTEM_OK,
+    .PhotoStatus = SYSTEM_OK
 };
 
 
@@ -58,8 +60,20 @@ void SystemCheckTask(void *pv) {
                 }
                 break;
             case LCD_DISPLAY:
-                if (systemStatus.LcdStatus != evt.status) { 
+                if (systemStatus.LcdStatus != evt.status) {
                     systemStatus.LcdStatus = evt.status;
+                    printSystemStatus = true; // Set flag to print status on change
+                }
+                break;
+            case GPT_CHAT:
+                if (systemStatus.GptStatus != evt.status) {
+                    systemStatus.GptStatus = evt.status;
+                    printSystemStatus = true; // Set flag to print status on change
+                }
+                break;
+            case PHOTO_SENSOR:
+                if (systemStatus.PhotoStatus != evt.status) {
+                    systemStatus.PhotoStatus = evt.status;
                     printSystemStatus = true; // Set flag to print status on change
                 }
                 break;
@@ -83,12 +97,18 @@ void PrintSystemStatus() {
     Serial.print(" | DHT: ");
     Serial.print(systemStatus.DHTStatus == SYSTEM_OK ? "OK" : (systemStatus.DHTStatus == SYSTEM_WARN ? "WARN" : "ERR"));
     Serial.print(" | LCD: ");
-    Serial.println(systemStatus.LcdStatus == SYSTEM_OK ? "OK" : (systemStatus.LcdStatus == SYSTEM_WARN ? "WARN" : "ERR"));
+    Serial.print(systemStatus.LcdStatus == SYSTEM_OK ? "OK" : (systemStatus.LcdStatus == SYSTEM_WARN ? "WARN" : "ERR"));
+    Serial.print(" | GPT: ");
+    Serial.print(systemStatus.GptStatus == SYSTEM_OK ? "OK" : (systemStatus.GptStatus == SYSTEM_WARN ? "WARN" : "ERR"));
+    Serial.print(" | PHOTO: ");
+    Serial.println(systemStatus.PhotoStatus == SYSTEM_OK ? "OK" : (systemStatus.PhotoStatus == SYSTEM_WARN ? "WARN" : "ERR"));
     printSystemStatus = false; // Reset flag after printing
 }
 
 void LedIndicateSystemStatus(Led &led) {
-    if (systemStatus.WifiStatus == SYSTEM_ERROR || systemStatus.DHTStatus == SYSTEM_ERROR || systemStatus.LcdStatus == SYSTEM_ERROR) {
+    if (systemStatus.WifiStatus  == SYSTEM_ERROR || systemStatus.DHTStatus   == SYSTEM_ERROR ||
+        systemStatus.LcdStatus   == SYSTEM_ERROR || systemStatus.GptStatus   == SYSTEM_ERROR ||
+        systemStatus.PhotoStatus == SYSTEM_ERROR) {
         LedOn(led); // Turn on LED if any system is in error state
     } else {
         LedOff(led); // Turn off LED if all systems are OK or in warning state

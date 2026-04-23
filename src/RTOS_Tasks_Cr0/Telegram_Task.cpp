@@ -18,12 +18,14 @@
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(WiFiConfig::BOT_TOKEN, client);
-String keyboard_menu  = "[[\"Temperature\", \"Humidity\"]]";
+String keyboard_menu  = "[[\"Temperature\", \"Humidity\", \"Light\"], [\"Advice\"]]";
 
 
 float lastTemperature = 0;
 float lastHumidity = 0;
+uint16_t lastLightLevel = 0;
 bool lastWiFiStatus = false;
+char  lastGptAdvice[GPT_ADVICE_MAX_LEN] = "";
 
 void TelegramTask(void *pvParameters) 
 {
@@ -31,7 +33,7 @@ void TelegramTask(void *pvParameters)
     vTaskDelay(pdMS_TO_TICKS(5000));  // wait WiFi
 
     bot.getUpdates(bot.last_message_received + 1); 
-
+    
     for(;;) 
     {
         if (xSemaphoreTake(dataMutex, MUTEX_TIMEOUT) == pdTRUE) 
@@ -40,12 +42,14 @@ void TelegramTask(void *pvParameters)
             xSemaphoreGive(dataMutex);
         }
         
-        if (lastWiFiStatus) 
+        if (lastWiFiStatus)
         {
-            if (xSemaphoreTake(dataMutex, MUTEX_TIMEOUT) == pdTRUE) 
+            if (xSemaphoreTake(dataMutex, MUTEX_TIMEOUT) == pdTRUE)
             {
                 lastTemperature = sensorData.temperature;
                 lastHumidity = sensorData.humidity;
+                lastLightLevel = sensorData.lightLevel;
+                strlcpy(lastGptAdvice, sensorData.gptAdvice, sizeof(lastGptAdvice));
                 xSemaphoreGive(dataMutex);
             }
 
@@ -73,7 +77,8 @@ void HandleNewMessages(int numNewMessages)
             else
             {
                 String welcomeMessage = "Welcome to the Home Sensor Bot!\n";
-                welcomeMessage += "If you want to get current sensor readings, use the command /status.\n";
+                welcomeMessage += "Use /status to get current sensor readings.\n";
+                welcomeMessage += "Use /advice for ChatGPT-powered tips based on the climate at home.\n";
                 bot.sendMessage(chat_id, welcomeMessage, "");
             }
 
@@ -88,12 +93,34 @@ void HandleNewMessages(int numNewMessages)
             String message = "Current Temperature: " + String(lastTemperature, 2) + " °C";
             bot.sendMessage(chat_id, message, "");
         } 
-        else if (bot.messages[i].text == "Humidity") 
+        else if (bot.messages[i].text == "Humidity")
         {
             String message = "Current Humidity: " + String(lastHumidity, 2) + " %";
             bot.sendMessage(chat_id, message, "");
         }
-        else if (bot.messages[i].text == "Exit") 
+        else if (bot.messages[i].text == "Light" || bot.messages[i].text == "/light")
+        {
+            int pct = (int)((lastLightLevel * 100UL) / 4095UL);
+            String message = "Current Light: " + String(pct) + " % (raw "
+                             + String(lastLightLevel) + " / 4095)";
+            bot.sendMessage(chat_id, message, "");
+        }
+        else if (bot.messages[i].text == "/advice" || bot.messages[i].text == "Advice")
+        {
+            String message = "Climate now: " + String(lastTemperature, 1) + " C, "
+                             + String(lastHumidity, 0) + " %\n\n";
+            if (strlen(lastGptAdvice) == 0)
+            {
+                message += "ChatGPT hasn't produced advice yet. Please try again in a minute.";
+            }
+            else
+            {
+                message += "ChatGPT says:\n";
+                message += lastGptAdvice;
+            }
+            bot.sendMessage(chat_id, message, "");
+        }
+        else if (bot.messages[i].text == "Exit")
         {
             if (chat_id == WiFiConfig::ADMIN_CHAT_ID)
             {
